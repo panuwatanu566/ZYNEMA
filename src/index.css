@@ -1,0 +1,315 @@
+/* Custom React Enhancements and Overrides for ZYNEMA */
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Loading animations */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(0.88); opacity: 0.35; }
+  50% { transform: scale(1.18); opacity: 0.85; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-shimmer {
+  animation: shimmer 1.5s infinite linear;
+}
+
+body {
+  background-color: #0b0c2a;
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   FORM INPUT STYLING (High-Contrast, Crisp Text)
+   ============================================================ */
+.login__form form .input__item {
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative !important;
+  margin-bottom: 18px !important;
+}
+
+.login__form form .input__item input {
+  height: 52px !important;
+  width: 100% !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #0f172a !important; /* Crisp, high-contrast dark text */
+  background: #ffffff !important;
+  border: 2px solid transparent !important;
+  border-radius: 6px !important;
+  padding-left: 76px !important;
+  padding-right: 48px !important;
+  outline: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.2s ease !important;
+}
+
+.login__form form .input__item input:focus {
+  border-color: #e53637 !important;
+  box-shadow: 0 0 0 3px rgba(229, 54, 55, 0.25) !important;
+}
+
+.login__form form .input__item input::placeholder {
+  color: #94a3b8 !important; /* Visible placeholder */
+  font-weight: 400 !important;
+}
+
+.login__form form .input__item input::-webkit-input-placeholder {
+  color: #94a3b8 !important;
+}
+
+.login__form form .input__item input::-moz-placeholder {
+  color: #94a3b8 !important;
+}
+
+.login__form form .input__item span {
+  color: #64748b !important;
+  font-size: 20px !important;
+}
+
+.login__form form .input__item:before {
+  background: #cbd5e1 !important;
+  height: 30px !important;
+  top: 11px !important;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* Header layout & top-level nav items ONLY */
+.header__menu > ul {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  margin-bottom: 0 !important;
+  padding-left: 0 !important;
+  list-style: none !important;
+}
+
+.header__menu > ul > li {
+  margin-right: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  position: relative !important;
+}
+
+/* ============================================================
+   HEADER DROPDOWN (Vertical List inside the frame)
+   ============================================================ */
+.header__menu li.dropdown-container {
+  position: relative !important;
+}
+
+.header__menu ul.dropdown {
+  display: none !important;
+  flex-direction: column !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 100% !important;
+  width: 210px !important;
+  min-width: 210px !important;
+  background: #0e1035 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 8px !important;
+  text-align: left !important;
+  padding: 8px 0 !important;
+  z-index: 99999 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.85) !important;
+  white-space: normal !important;
+  list-style: none !important;
+  margin: 0 !important;
+}
+
+.header__menu li.dropdown-container:hover > ul.dropdown,
+.header__menu ul.dropdown.show {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  top: calc(100% + 4px) !important;
+}
+
+.header__menu ul.dropdown li {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.header__menu ul.dropdown li a {
+  display: block !important;
+  width: 100% !important;
+  font-size: 14px !important;
+  color: #cbd5e1 !important;
+  font-weight: 500 !important;
+  padding: 9px 20px !important;
+  text-transform: none !important;
+  transition: all 0.2s ease !important;
+  text-align: left !important;
+  line-height: 1.4 !important;
+}
+
+.header__menu ul.dropdown li a:hover {
+  color: #ffffff !important;
+  background: rgba(229, 54, 55, 0.22) !important;
+  padding-left: 24px !important;
+}
+
+/* ============================================================
+   CUSTOM MODAL OVERLAY & CARD (Fixed positioning & opacity bug)
+   ============================================================ */
+.custom-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(5, 6, 24, 0.92) !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  opacity: 1 !important;
+  overflow-y: auto !important;
+}
+
+.custom-modal-card {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 520px !important;
+  background: linear-gradient(145deg, #13153d, #0b0c2a) !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(229, 54, 55, 0.5) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(229, 54, 55, 0.25) !important;
+  overflow: hidden !important;
+  margin: auto !important;
+  opacity: 1 !important;
+  animation: customModalFadeIn 0.22s ease-out !important;
+}
+
+@keyframes customModalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.93) translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ============================================================
+   BREADCRUMBS STYLING (Fixed corrupted pseudo-elements & layout)
+   ============================================================ */
+/* Suppress legacy corrupted content: "?" from style.css */
+.breadcrumb__links a:after {
+  display: none !important;
+  content: "" !important;
+}
+
+.custom-breadcrumb-bar {
+  background: rgba(8, 9, 30, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 0;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.custom-breadcrumb-bar nav {
+  display: flex;
+  align-items: center;
+}
+
+.custom-breadcrumb-bar ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.custom-breadcrumb-bar a {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.custom-breadcrumb-bar a:hover {
+  color: #e53637;
+}
+
+.custom-breadcrumb-bar .separator {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 11px;
+  margin: 0 4px;
+}
+
+.custom-breadcrumb-bar .current-item {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Search Modal enhancements */
+.search-model .search-close-switch:hover {
+  color: #e53637 !important;
+}
+
+.search-results .search-item:hover {
+  background: rgba(229, 54, 55, 0.2) !important;
+}
+
+/* Responsive video player */
+.anime__video__player video {
+  max-height: 540px;
+  background: #000;
+  width: 100%;
+}
+
+/* Set BG utility helper for inline backgroundImage */
+.set-bg {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: top center;
+}
+
+/* Button hover feedback */
+.follow-btn:hover {
+  background: #e53637;
+  color: #fff;
+}
