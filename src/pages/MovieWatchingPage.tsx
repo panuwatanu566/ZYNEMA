@@ -9,12 +9,12 @@ import { LoadingSpinner } from '../components/LoadingSpinner';
 
 // Working Video Sources
 const VIDEO_SOURCES = {
-  // Free Tier Trailer Video Source
-  trailer: 'https://media.w3.org/2010/05/sintel/trailer.mp4',
+  // Free Tier Trailer Video Source (Requested YouTube: https://youtu.be/A1cIa2J0e6U)
+  trailer: 'https://www.youtube.com/embed/A1cIa2J0e6U?autoplay=1&rel=0',
 
-  // Premium Full Video Sources (Found from reliable public CDNs & local server)
+  // Premium Full Video Sources (Requested YouTube: https://youtu.be/Af6i6ChAVTw)
   fullMovieServers: [
-    { name: 'Server 1 (Local Fast Stream)', url: '/videos/1.mp4' },
+    { name: 'Server 1 (VIP Stream YouTube 4K)', url: 'https://www.youtube.com/embed/Af6i6ChAVTw?autoplay=1&rel=0' },
     { name: 'Server 2 (Cloud CDN HD)', url: 'https://vjs.zencdn.net/v/oceans.mp4' },
     { name: 'Server 3 (Archive High-Res)', url: 'https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4' }
   ]
@@ -246,23 +246,42 @@ export const MovieWatchingPage: React.FC = () => {
                   </span>
                 </div>
 
-                {/* HTML5 Native Video Player */}
-                <video
-                  ref={videoRef}
-                  id="player"
-                  playsInline
-                  controls
-                  poster={currentEp.image?.original || show?.image?.original || '/videos/anime-watch.jpg'}
-                  style={{
-                    width: '100%',
-                    maxHeight: '580px',
-                    display: 'block',
-                    backgroundColor: '#000'
-                  }}
-                >
-                  <source src={currentVideoUrl} type="video/mp4" />
-                  Your browser does not support HTML5 video streaming.
-                </video>
+                {/* YouTube Embed Player or HTML5 Native Video Player */}
+                {currentVideoUrl.includes('youtube.com') ? (
+                  <div className="embed-responsive embed-responsive-16by9" style={{ minHeight: '480px' }}>
+                    <iframe
+                      className="embed-responsive-item"
+                      src={currentVideoUrl}
+                      title={showName}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      style={{
+                        width: '100%',
+                        height: '520px',
+                        border: 'none',
+                        display: 'block',
+                        backgroundColor: '#000'
+                      }}
+                    ></iframe>
+                  </div>
+                ) : (
+                  <video
+                    ref={videoRef}
+                    id="player"
+                    playsInline
+                    controls
+                    poster={currentEp.image?.original || show?.image?.original || '/videos/anime-watch.jpg'}
+                    style={{
+                      width: '100%',
+                      maxHeight: '580px',
+                      display: 'block',
+                      backgroundColor: '#000'
+                    }}
+                  >
+                    <source src={currentVideoUrl} type="video/mp4" />
+                    Your browser does not support HTML5 video streaming.
+                  </video>
+                )}
               </div>
 
               {/* Free Tier Notice Banner */}

@@ -158,7 +158,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
                             className={`badge ${isPremium ? 'badge-warning text-dark' : 'badge-info'}`}
                             style={{ fontSize: '10px' }}
                           >
-                            Tier: {user.tier.toUpperCase()}
+                            Tier: {(user.tier || (isPremium ? 'premium' : 'free')).toUpperCase()}
                           </span>
                         </div>
                       </div>

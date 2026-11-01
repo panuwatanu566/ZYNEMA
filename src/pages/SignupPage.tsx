@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth, validatePassword } from '../context/AuthContext';
-import { UserTier } from '../types/zynema';
+import { fieldErrors, getErrorMessage } from '../lib/api';
 
 export const SignupPage: React.FC = () => {
   const { register } = useAuth();
@@ -9,39 +9,54 @@ export const SignupPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [tier, setTier] = useState<UserTier>('free');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  // Real-time password validation
+  // Real-time password validation based on API rules (8-72 chars, letters & numbers)
   const validation = validatePassword(password);
   const passwordsMatch = password.length > 0 && password === confirmPassword;
   const isConfirmDirty = confirmPassword.length > 0;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setErrors({});
+    setErrorMessage('');
 
-    if (!validation.isValid) {
-      setError('Please satisfy all password security requirements before proceeding.');
+    // Pre-flight client checks
+    if (!name.trim()) {
+      setErrors((prev) => ({ ...prev, name: 'กรุณากรอกชื่อ-นามสกุล' }));
+      return;
+    }
+
+    if (!email.trim()) {
+      setErrors((prev) => ({ ...prev, email: 'กรุณากรอกอีเมล' }));
+      return;
+    }
+
+    if (password.length < 8) {
+      setErrors((prev) => ({ ...prev, password: 'รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร' }));
       return;
     }
 
     if (!passwordsMatch) {
-      setError('Passwords do not match. Please verify your confirm password field.');
+      setErrors((prev) => ({ ...prev, confirmPassword: 'รหัสผ่านทั้งสองช่องไม่ตรงกัน' }));
       return;
     }
 
     setIsSubmitting(true);
-    const result = register(name, email, password, tier);
-    setIsSubmitting(false);
 
-    if (result.success) {
+    try {
+      await register(name, email, password);
+      // Successful registration returns tokens & logs user in
       navigate('/');
-    } else {
-      setError(result.error || 'Failed to create account.');
+    } catch (err: any) {
+      setErrors(fieldErrors(err));
+      setErrorMessage(getErrorMessage(err, 'การสมัครสมาชิกล้มเหลว กรุณาตรวจสอบข้อมูลอีกครั้ง'));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -66,8 +81,8 @@ export const SignupPage: React.FC = () => {
           <div className="row">
             <div className="col-lg-12 text-center">
               <div className="normal__breadcrumb__text">
-                <h2>Join ZYNEMA</h2>
-                <p>Create your streaming account and explore movies & shows from TVMaze.</p>
+                <h2>สมัครสมาชิก ZYNEMA</h2>
+                <p>สร้างบัญชีเพื่อเข้าถึงคลังภาพยนตร์ ซีรีส์ และทดลองรับชมความคมชัดระดับ 4K</p>
               </div>
             </div>
           </div>
@@ -82,65 +97,126 @@ export const SignupPage: React.FC = () => {
                 className="login__form p-4 p-md-5 rounded"
                 style={{ background: '#0e1035', border: '1px solid rgba(255,255,255,0.08)' }}
               >
-                <h3 className="mb-4">Create New Account</h3>
+                <div className="d-flex align-items-center justify-content-between mb-4">
+                  <h3 className="mb-0 text-white font-weight-bold">สร้างบัญชีใหม่ (Register)</h3>
+                  <span className="badge badge-danger px-2 py-1" style={{ fontSize: '11px' }}>
+                    API v1 Real-time
+                  </span>
+                </div>
 
-                {error && (
-                  <div className="alert alert-danger py-2 small" role="alert">
-                    <i className="fa fa-exclamation-triangle mr-1"></i> {error}
+                {/* Overall Error Alert (e.g. 409 EMAIL_ALREADY_EXISTS, 429 RATE_LIMITED) */}
+                {errorMessage && (
+                  <div
+                    className="alert alert-danger py-2 px-3 mb-4 rounded d-flex align-items-center"
+                    role="alert"
+                    style={{ background: 'rgba(231, 76, 60, 0.2)', border: '1px solid #e74c3c', color: '#ffb3b3' }}
+                  >
+                    <i className="fa fa-exclamation-triangle mr-2" style={{ fontSize: '18px' }}></i>
+                    <div>
+                      <strong>แจ้งเตือน:</strong> {errorMessage}
+                    </div>
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate>
                   {/* Full Name */}
-                  <div className="input__item">
-                    <input
-                      type="text"
-                      placeholder="Full Name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                    <span className="icon_profile"></span>
+                  <div className="mb-3">
+                    <div
+                      className="input__item mb-1 position-relative"
+                      style={{ border: errors.name ? '1px solid #e74c3c' : undefined }}
+                    >
+                      <input
+                        name="name"
+                        type="text"
+                        placeholder="ชื่อ-นามสกุล (Full Name: 2-50 ตัวอักษร)"
+                        value={name}
+                        onChange={(e) => {
+                          setName(e.target.value);
+                          if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
+                        }}
+                        required
+                        disabled={isSubmitting}
+                      />
+                      <span className="icon_profile"></span>
+                    </div>
+                    {/* Error message under Name */}
+                    {errors.name && (
+                      <small className="text-danger font-weight-bold d-block pl-1">
+                        <i className="fa fa-times-circle mr-1"></i> {errors.name}
+                      </small>
+                    )}
                   </div>
 
                   {/* Email */}
-                  <div className="input__item">
-                    <input
-                      type="email"
-                      placeholder="Email address"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                    <span className="icon_mail"></span>
+                  <div className="mb-3">
+                    <div
+                      className="input__item mb-1 position-relative"
+                      style={{ border: errors.email ? '1px solid #e74c3c' : undefined }}
+                    >
+                      <input
+                        name="email"
+                        type="email"
+                        placeholder="อีเมล (Email address)"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
+                        }}
+                        required
+                        disabled={isSubmitting}
+                      />
+                      <span className="icon_mail"></span>
+                    </div>
+                    {/* Error message under Email */}
+                    {errors.email && (
+                      <small className="text-danger font-weight-bold d-block pl-1">
+                        <i className="fa fa-times-circle mr-1"></i> {errors.email}
+                      </small>
+                    )}
                   </div>
 
                   {/* Password with Show/Hide toggle */}
-                  <div className="input__item position-relative mb-2">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                    <span className="icon_lock"></span>
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="border-0 bg-transparent text-muted position-absolute"
-                      style={{ right: '15px', top: '14px', cursor: 'pointer', zIndex: 5 }}
-                      title={showPassword ? 'Hide password' : 'Show password'}
+                  <div className="mb-3">
+                    <div
+                      className="input__item position-relative mb-1"
+                      style={{ border: errors.password ? '1px solid #e74c3c' : undefined }}
                     >
-                      <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                    </button>
+                      <input
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="รหัสผ่าน (8–72 ตัวอักษร มีทั้งตัวอักษรและตัวเลข)"
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (errors.password) setErrors((prev) => ({ ...prev, password: '' }));
+                        }}
+                        required
+                        disabled={isSubmitting}
+                      />
+                      <span className="icon_lock"></span>
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="border-0 bg-transparent text-muted position-absolute"
+                        style={{ right: '15px', top: '14px', cursor: 'pointer', zIndex: 5 }}
+                        title={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+                      >
+                        <i className={`fa ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                      </button>
+                    </div>
+                    {/* Error message under Password */}
+                    {errors.password && (
+                      <small className="text-danger font-weight-bold d-block pl-1">
+                        <i className="fa fa-times-circle mr-1"></i> {errors.password}
+                      </small>
+                    )}
                   </div>
 
                   {/* Password Strength Meter Bar */}
                   {password.length > 0 && (
                     <div className="mb-3">
                       <div className="d-flex justify-content-between align-items-center mb-1">
-                        <span className="small text-muted">Password Strength:</span>
+                        <span className="small text-muted">ระดับความปลอดภัยของรหัสผ่าน:</span>
                         <span
                           className="small font-weight-bold text-uppercase"
                           style={{ color: getStrengthColor() }}
@@ -167,30 +243,14 @@ export const SignupPage: React.FC = () => {
                     className="p-3 mb-3 rounded"
                     style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}
                   >
-                    <div className="small font-weight-bold text-muted mb-2">Password Requirements:</div>
+                    <div className="small font-weight-bold text-muted mb-2">เงื่อนไขรหัสผ่านตามมาตรฐาน API:</div>
                     <div className="row small" style={{ rowGap: '6px' }}>
                       <div className="col-sm-6">
                         <i
                           className={`fa ${validation.hasMinLength ? 'fa-check-circle text-success' : 'fa-circle-o text-muted'} mr-2`}
                         ></i>
                         <span className={validation.hasMinLength ? 'text-white' : 'text-muted'}>
-                          At least 8 characters
-                        </span>
-                      </div>
-                      <div className="col-sm-6">
-                        <i
-                          className={`fa ${validation.hasUpperCase ? 'fa-check-circle text-success' : 'fa-circle-o text-muted'} mr-2`}
-                        ></i>
-                        <span className={validation.hasUpperCase ? 'text-white' : 'text-muted'}>
-                          Uppercase letter (A-Z)
-                        </span>
-                      </div>
-                      <div className="col-sm-6">
-                        <i
-                          className={`fa ${validation.hasLowerCase ? 'fa-check-circle text-success' : 'fa-circle-o text-muted'} mr-2`}
-                        ></i>
-                        <span className={validation.hasLowerCase ? 'text-white' : 'text-muted'}>
-                          Lowercase letter (a-z)
+                          ความยาวอย่างน้อย 8 ตัวอักษร
                         </span>
                       </div>
                       <div className="col-sm-6">
@@ -198,100 +258,97 @@ export const SignupPage: React.FC = () => {
                           className={`fa ${validation.hasNumber ? 'fa-check-circle text-success' : 'fa-circle-o text-muted'} mr-2`}
                         ></i>
                         <span className={validation.hasNumber ? 'text-white' : 'text-muted'}>
-                          At least one number (0-9)
+                          มีตัวเลขอย่างน้อย 1 ตัว (0-9)
                         </span>
                       </div>
-                      <div className="col-sm-12">
+                      <div className="col-sm-6">
+                        <i
+                          className={`fa ${validation.hasLowerCase || validation.hasUpperCase ? 'fa-check-circle text-success' : 'fa-circle-o text-muted'} mr-2`}
+                        ></i>
+                        <span className={validation.hasLowerCase || validation.hasUpperCase ? 'text-white' : 'text-muted'}>
+                          มีตัวอักษรภาษาอังกฤษ (a-z, A-Z)
+                        </span>
+                      </div>
+                      <div className="col-sm-6">
                         <i
                           className={`fa ${validation.hasSpecialChar ? 'fa-check-circle text-success' : 'fa-circle-o text-muted'} mr-2`}
                         ></i>
                         <span className={validation.hasSpecialChar ? 'text-white' : 'text-muted'}>
-                          Special character (!@#$%^&*...)
+                          อักขระพิเศษ (!@#$%^&*...)
                         </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Confirm Password */}
-                  <div className="input__item mb-2">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Confirm Password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                    <span className="icon_lock"></span>
+                  <div className="mb-3">
+                    <div
+                      className="input__item mb-1 position-relative"
+                      style={{ border: errors.confirmPassword ? '1px solid #e74c3c' : undefined }}
+                    >
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="ยืนยันรหัสผ่านอีกครั้ง (Confirm Password)"
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          setConfirmPassword(e.target.value);
+                          if (errors.confirmPassword) setErrors((prev) => ({ ...prev, confirmPassword: '' }));
+                        }}
+                        required
+                        disabled={isSubmitting}
+                      />
+                      <span className="icon_lock"></span>
+                    </div>
+
+                    {/* Confirm Password Feedback */}
+                    {isConfirmDirty && (
+                      <div className="small pl-1">
+                        {passwordsMatch ? (
+                          <span className="text-success font-weight-bold">
+                            <i className="fa fa-check-circle mr-1"></i> รหัสผ่านตรงกันเรียบร้อย
+                          </span>
+                        ) : (
+                          <span className="text-danger font-weight-bold">
+                            <i className="fa fa-times-circle mr-1"></i> รหัสผ่านไม่ตรงกัน
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {errors.confirmPassword && (
+                      <small className="text-danger font-weight-bold d-block pl-1">
+                        <i className="fa fa-times-circle mr-1"></i> {errors.confirmPassword}
+                      </small>
+                    )}
                   </div>
 
-                  {/* Confirm Password Feedback */}
-                  {isConfirmDirty && (
-                    <div className="mb-3 small">
-                      {passwordsMatch ? (
-                        <span className="text-success">
-                          <i className="fa fa-check mr-1"></i> Passwords match perfectly
-                        </span>
-                      ) : (
-                        <span className="text-danger">
-                          <i className="fa fa-times mr-1"></i> Passwords do not match
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Membership Tier Plan Selection */}
-                  <div className="mb-4">
-                    <label className="text-white small font-weight-bold mb-2">Select Initial Plan:</label>
-                    <div className="row">
-                      <div className="col-6">
-                        <div
-                          onClick={() => setTier('free')}
-                          className={`p-3 rounded text-center ${tier === 'free' ? 'border border-danger' : 'border border-secondary'}`}
-                          style={{
-                            cursor: 'pointer',
-                            background: tier === 'free' ? 'rgba(229, 54, 55, 0.15)' : 'rgba(255,255,255,0.03)'
-                          }}
-                        >
-                          <div className="font-weight-bold text-white">Free Member</div>
-                          <div className="text-muted small">Standard HD (720p)</div>
-                          <div className="badge badge-secondary mt-1">$0 / forever</div>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div
-                          onClick={() => setTier('premium')}
-                          className={`p-3 rounded text-center ${tier === 'premium' ? 'border border-warning' : 'border border-secondary'}`}
-                          style={{
-                            cursor: 'pointer',
-                            background: tier === 'premium' ? 'rgba(243, 156, 18, 0.15)' : 'rgba(255,255,255,0.03)'
-                          }}
-                        >
-                          <div className="font-weight-bold text-warning">👑 VIP Premium</div>
-                          <div className="text-muted small">4K Ultra HD & All Eps</div>
-                          <div className="badge badge-warning text-dark mt-1">$9.99 / mo</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
+                  {/* Submit Button */}
                   <button
                     type="submit"
-                    className="site-btn btn-block"
-                    disabled={isSubmitting || !validation.isValid || !passwordsMatch}
+                    className="site-btn btn-block mt-4"
+                    disabled={isSubmitting || (isConfirmDirty && !passwordsMatch)}
+                    style={{
+                      height: '48px',
+                      fontSize: '15px',
+                      fontWeight: 600,
+                      borderRadius: '6px',
+                      letterSpacing: '0.5px'
+                    }}
                   >
                     {isSubmitting ? (
-                      <span><i className="fa fa-spinner fa-spin mr-1"></i> Registering Account...</span>
+                      <span>
+                        <i className="fa fa-spinner fa-spin mr-2"></i> กำลังสร้างบัญชีผู้ใช้...
+                      </span>
                     ) : (
-                      'Create ZYNEMA Account'
+                      'ลงทะเบียนสมาชิก (Create ZYNEMA Account)'
                     )}
                   </button>
                 </form>
 
                 <div className="mt-4 text-center">
                   <p className="text-white-50 mb-0">
-                    Already have an account?{' '}
+                    มีบัญชี ZYNEMA อยู่แล้วใช่หรือไม่?{' '}
                     <Link to="/login" className="text-danger font-weight-bold">
-                      Log In here
+                      เข้าสู่ระบบได้ที่นี่
                     </Link>
                   </p>
                 </div>

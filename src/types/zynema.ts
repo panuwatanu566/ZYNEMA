@@ -1,11 +1,27 @@
 export type UserTier = 'free' | 'premium';
+export type UserRole = 'USER' | 'EDITOR' | 'ADMIN';
+export type UserStatus = 'ACTIVE' | 'BANNED';
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  tier: UserTier;
+  avatarUrl?: string | null;
+  role?: UserRole;
+  status?: UserStatus;
+  isProtected?: boolean;
+  tier?: UserTier;
   createdAt: string;
+  updatedAt?: string;
+}
+
+export interface AuthResult {
+  user: User;
+  tokenType: 'Bearer';
+  accessToken: string;
+  expiresIn: number;
+  refreshToken: string;
+  refreshExpiresIn: number;
 }
 
 export interface AuthState {

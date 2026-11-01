@@ -50,7 +50,7 @@ export const ProfilePage: React.FC = () => {
                 <h4 className="text-white font-weight-bold mb-1">{user.name}</h4>
                 <p className="text-muted small mb-2">{user.email}</p>
 
-                <div className="mb-3">
+                <div className="mb-2">
                   <span
                     className={`badge ${isPremium ? 'badge-warning text-dark font-weight-bold' : 'badge-info'} px-3 py-2`}
                     style={{ fontSize: '13px' }}
@@ -59,8 +59,17 @@ export const ProfilePage: React.FC = () => {
                   </span>
                 </div>
 
+                {user.role && (
+                  <div className="mb-2">
+                    <span className="badge badge-dark text-white border border-secondary px-2 py-1 small">
+                      Role: <strong className="text-warning">{user.role}</strong>
+                      {user.isProtected && ' (Demo Protected)'}
+                    </span>
+                  </div>
+                )}
+
                 <p className="small text-muted mb-4">
-                  Account Created: {user.createdAt || '2024-01-01'}
+                  Account Created: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recent'}
                 </p>
 
                 <button

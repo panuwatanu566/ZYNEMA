@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, UserTier } from '../types/zynema';
+import { User, UserTier, UserRole } from '../types/zynema';
+import { api, tokenStore } from '../lib/api';
 
 export interface PasswordValidationResult {
   isValid: boolean;
@@ -12,6 +13,9 @@ export interface PasswordValidationResult {
   strength: 'weak' | 'medium' | 'strong';
 }
 
+/**
+ * Validates password according to API rules (8–72 characters, must include English letters & numbers)
+ */
 export const validatePassword = (password: string): PasswordValidationResult => {
   const hasMinLength = password.length >= 8;
   const hasUpperCase = /[A-Z]/.test(password);
@@ -33,7 +37,8 @@ export const validatePassword = (password: string): PasswordValidationResult => 
     strength = 'medium';
   }
 
-  const isValid = hasMinLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+  // API rule: 8-72 chars, must have letters and numbers
+  const isValid = hasMinLength && (hasUpperCase || hasLowerCase) && hasNumber && password.length <= 72;
 
   return {
     isValid,
@@ -47,271 +52,227 @@ export const validatePassword = (password: string): PasswordValidationResult => 
   };
 };
 
-interface StoredUser extends User {
-  passwordHash: string;
-}
-
 interface AuthContextType {
   user: User | null;
+  loading: boolean;
   isAuthenticated: boolean;
   isPremium: boolean;
   rememberedEmail: string;
   isUpgradeModalOpen: boolean;
   openUpgradeModal: () => void;
   closeUpgradeModal: () => void;
-  login: (email: string, password: string, rememberMe?: boolean) => { success: boolean; error?: string };
-  register: (name: string, email: string, password: string, tier?: UserTier) => { success: boolean; error?: string };
-  logout: () => void;
-  forgotPassword: (email: string) => { success: boolean; message: string };
-  resetPassword: (email: string, newPassword: string) => { success: boolean; error?: string };
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<User>;
+  register: (name: string, email: string, password: string) => Promise<User>;
+  logout: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<{ message: string; resetToken: string | null; expiresIn: number }>;
+  resetPassword: (resetToken: string, newPassword: string) => Promise<{ message: string }>;
   upgradeToPremium: () => void;
   downgradeToFree: () => void;
+  hasRole: (...roles: string[]) => boolean;
   canWatchEpisode: (episodeIndex: number, isPremiumShow?: boolean) => boolean;
   canWatchFullMovie: boolean;
 }
 
-const STORAGE_USERS_KEY = 'zynema_registered_users';
-const STORAGE_CURRENT_USER_KEY = 'zynema_active_user';
 const STORAGE_REMEMBER_EMAIL_KEY = 'zynema_remembered_email';
-
-// Default pre-seeded users for instant testing
-const DEFAULT_USERS: StoredUser[] = [
-  {
-    id: 'usr-free-1',
-    name: 'Free Member',
-    email: 'free@zynema.com',
-    passwordHash: 'Demo1234!',
-    tier: 'free',
-    createdAt: '2024-01-15'
-  },
-  {
-    id: 'usr-premium-1',
-    name: 'VIP Movie Lover',
-    email: 'premium@zynema.com',
-    passwordHash: 'Demo1234!',
-    tier: 'premium',
-    createdAt: '2024-01-01'
-  }
-];
+const STORAGE_USER_TIER_KEY = 'zynema_local_tier_preference';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [rememberedEmail, setRememberedEmail] = useState<string>('');
+  const [localTier, setLocalTier] = useState<UserTier>(() => {
+    return (localStorage.getItem(STORAGE_USER_TIER_KEY) as UserTier) || 'free';
+  });
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
-  // Initialize from localStorage
-  useEffect(() => {
-    // Seed default users if none exist
-    const existingUsers = localStorage.getItem(STORAGE_USERS_KEY);
-    if (!existingUsers) {
-      localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(DEFAULT_USERS));
-    }
+  // Determine if active user has VIP/Premium streaming access
+  // ADMIN and EDITOR automatically have full VIP access. USER tier can also have VIP if upgraded.
+  const isPremium = user?.role === 'ADMIN' || user?.role === 'EDITOR' || user?.tier === 'premium' || localTier === 'premium';
 
+  // Initialize Auth state from stored tokens on app start
+  useEffect(() => {
     // Check remembered email
     const savedEmail = localStorage.getItem(STORAGE_REMEMBER_EMAIL_KEY);
     if (savedEmail) {
       setRememberedEmail(savedEmail);
     }
 
-    // Check current session
-    const savedUser = localStorage.getItem(STORAGE_CURRENT_USER_KEY);
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
-      }
-    }
-  }, []);
+    // Call GET /auth/me if accessToken exists
+    if (tokenStore.access) {
+      api.get('/auth/me')
+        .then(({ data }) => {
+          const apiUser = data.data;
+          const assignedTier: UserTier =
+            apiUser.role === 'ADMIN' || apiUser.role === 'EDITOR'
+              ? 'premium'
+              : (localStorage.getItem(STORAGE_USER_TIER_KEY) as UserTier) || 'free';
 
-  const getUsers = (): StoredUser[] => {
-    try {
-      const stored = localStorage.getItem(STORAGE_USERS_KEY);
-      return stored ? JSON.parse(stored) : DEFAULT_USERS;
-    } catch {
-      return DEFAULT_USERS;
-    }
-  };
-
-  const saveUsers = (users: StoredUser[]) => {
-    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
-  };
-
-  const login = (email: string, password: string, rememberMe = false): { success: boolean; error?: string } => {
-    const trimmedEmail = email.trim().toLowerCase();
-    const users = getUsers();
-    const matched = users.find(u => u.email.toLowerCase() === trimmedEmail);
-
-    if (!matched) {
-      return { success: false, error: 'No account found with this email address.' };
+          setUser({
+            ...apiUser,
+            tier: assignedTier
+          });
+        })
+        .catch((err) => {
+          const code = err.response?.data?.error?.code;
+          // Only clear tokens if the token is invalid or user is banned.
+          // Do not log out on 5xx or network errors.
+          if (['TOKEN_INVALID', 'TOKEN_MISSING', 'REFRESH_TOKEN_INVALID', 'ACCOUNT_BANNED'].includes(code)) {
+            tokenStore.clear();
+            setUser(null);
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
     }
 
-    if (matched.passwordHash !== password) {
-      return { success: false, error: 'Incorrect password. Please try again.' };
-    }
-
-    const sessionUser: User = {
-      id: matched.id,
-      name: matched.name,
-      email: matched.email,
-      tier: matched.tier,
-      createdAt: matched.createdAt
+    // Listen to global logout events dispatched by the api interceptor
+    const onLogout = () => {
+      setUser(null);
     };
 
-    setUser(sessionUser);
-    localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(sessionUser));
+    window.addEventListener('auth:logout', onLogout);
+    return () => {
+      window.removeEventListener('auth:logout', onLogout);
+    };
+  }, []);
 
-    if (rememberMe) {
-      localStorage.setItem(STORAGE_REMEMBER_EMAIL_KEY, trimmedEmail);
-      setRememberedEmail(trimmedEmail);
-    } else {
+  const handleAuthSuccess = (data: any, emailToRemember?: string, rememberMe = false): User => {
+    tokenStore.save(data);
+    const apiUser = data.user;
+    const assignedTier: UserTier =
+      apiUser.role === 'ADMIN' || apiUser.role === 'EDITOR'
+        ? 'premium'
+        : (localStorage.getItem(STORAGE_USER_TIER_KEY) as UserTier) || 'free';
+
+    const fullUser: User = {
+      ...apiUser,
+      tier: assignedTier
+    };
+
+    setUser(fullUser);
+
+    if (rememberMe && emailToRemember) {
+      localStorage.setItem(STORAGE_REMEMBER_EMAIL_KEY, emailToRemember);
+      setRememberedEmail(emailToRemember);
+    } else if (!rememberMe) {
       localStorage.removeItem(STORAGE_REMEMBER_EMAIL_KEY);
       setRememberedEmail('');
     }
 
-    return { success: true };
+    return fullUser;
   };
 
-  const register = (
-    name: string,
-    email: string,
-    password: string,
-    tier: UserTier = 'free'
-  ): { success: boolean; error?: string } => {
-    const trimmedEmail = email.trim().toLowerCase();
+  /**
+   * Log in via POST /auth/login
+   */
+  const login = async (email: string, password: string, rememberMe = false): Promise<User> => {
+    const trimmedEmail = email.trim();
+    const response = await api.post('/auth/login', {
+      email: trimmedEmail,
+      password
+    });
+
+    return handleAuthSuccess(response.data.data, trimmedEmail, rememberMe);
+  };
+
+  /**
+   * Register via POST /auth/register
+   * Server returns tokens and automatically logs user in.
+   */
+  const register = async (name: string, email: string, password: string): Promise<User> => {
+    const trimmedEmail = email.trim();
     const trimmedName = name.trim();
 
-    if (!trimmedName) {
-      return { success: false, error: 'Please enter your full name.' };
-    }
-
-    const validation = validatePassword(password);
-    if (!validation.isValid) {
-      return { success: false, error: 'Password does not meet the security criteria.' };
-    }
-
-    const users = getUsers();
-    if (users.some(u => u.email.toLowerCase() === trimmedEmail)) {
-      return { success: false, error: 'An account with this email already exists.' };
-    }
-
-    const newUser: StoredUser = {
-      id: `usr-${Date.now()}`,
+    const response = await api.post('/auth/register', {
       name: trimmedName,
       email: trimmedEmail,
-      passwordHash: password,
-      tier,
-      createdAt: new Date().toISOString().split('T')[0]
-    };
+      password
+    });
 
-    const updatedUsers = [...users, newUser];
-    saveUsers(updatedUsers);
-
-    // Auto-login newly registered user
-    const sessionUser: User = {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      tier: newUser.tier,
-      createdAt: newUser.createdAt
-    };
-
-    setUser(sessionUser);
-    localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(sessionUser));
-
-    return { success: true };
+    return handleAuthSuccess(response.data.data, trimmedEmail, true);
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
-  };
-
-  const forgotPassword = (email: string): { success: boolean; message: string } => {
-    const trimmedEmail = email.trim().toLowerCase();
-    const users = getUsers();
-    const exists = users.find(u => u.email.toLowerCase() === trimmedEmail);
-
-    if (!exists) {
-      return { success: false, message: 'If an account exists with this email, a reset verification code has been dispatched.' };
+  /**
+   * Logout via POST /auth/logout
+   */
+  const logout = async (): Promise<void> => {
+    try {
+      const refreshToken = tokenStore.refresh;
+      if (refreshToken) {
+        await api.post('/auth/logout', { refreshToken });
+      }
+    } catch {
+      // Ignore network errors on logout
+    } finally {
+      tokenStore.clear();
+      setUser(null);
     }
-
-    return {
-      success: true,
-      message: `Password reset instructions have been generated for ${exists.email}. You can now proceed to set a new password.`
-    };
   };
 
-  const resetPassword = (email: string, newPassword: string): { success: boolean; error?: string } => {
-    const trimmedEmail = email.trim().toLowerCase();
-    const validation = validatePassword(newPassword);
-    if (!validation.isValid) {
-      return { success: false, error: 'New password does not meet the security criteria.' };
-    }
-
-    const users = getUsers();
-    const userIndex = users.findIndex(u => u.email.toLowerCase() === trimmedEmail);
-
-    if (userIndex === -1) {
-      return { success: false, error: 'Account not found.' };
-    }
-
-    users[userIndex].passwordHash = newPassword;
-    saveUsers(users);
-
-    return { success: true };
+  /**
+   * Forgot password via POST /auth/forgot-password
+   */
+  const forgotPassword = async (email: string) => {
+    const response = await api.post('/auth/forgot-password', { email: email.trim() });
+    return response.data.data;
   };
 
+  /**
+   * Reset password via POST /auth/reset-password
+   */
+  const resetPassword = async (resetToken: string, newPassword: string) => {
+    const response = await api.post('/auth/reset-password', {
+      resetToken,
+      newPassword
+    });
+    return response.data.data;
+  };
+
+  /**
+   * Upgrade user to VIP Premium streaming tier
+   */
   const upgradeToPremium = () => {
-    if (!user) {
-      setIsUpgradeModalOpen(true);
-      return;
-    }
-    const updatedUser: User = { ...user, tier: 'premium' };
-    setUser(updatedUser);
-    localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(updatedUser));
-
-    // Update in user db as well
-    const users = getUsers();
-    const index = users.findIndex(u => u.id === user.id);
-    if (index !== -1) {
-      users[index].tier = 'premium';
-      saveUsers(users);
+    localStorage.setItem(STORAGE_USER_TIER_KEY, 'premium');
+    setLocalTier('premium');
+    if (user) {
+      setUser({ ...user, tier: 'premium' });
     }
     setIsUpgradeModalOpen(false);
   };
 
+  /**
+   * Switch back to Free streaming tier for evaluation/testing
+   */
   const downgradeToFree = () => {
-    if (!user) return;
-    const updatedUser: User = { ...user, tier: 'free' };
-    setUser(updatedUser);
-    localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(updatedUser));
-
-    const users = getUsers();
-    const index = users.findIndex(u => u.id === user.id);
-    if (index !== -1) {
-      users[index].tier = 'free';
-      saveUsers(users);
+    localStorage.setItem(STORAGE_USER_TIER_KEY, 'free');
+    setLocalTier('free');
+    if (user) {
+      setUser({ ...user, tier: 'free' });
     }
   };
 
-  // Content authorization check:
-  // Episode index 0 & 1 (Ep 1 & 2) are FREE for everyone.
-  // Episode index 2+ (Ep 3+) or Premium Exclusive shows require Premium tier.
+  const hasRole = (...roles: string[]): boolean => {
+    return !!user && !!user.role && roles.includes(user.role);
+  };
+
   const canWatchEpisode = (episodeIndex: number, isPremiumShow = false): boolean => {
-    if (user?.tier === 'premium') return true;
+    if (isPremium) return true;
     if (isPremiumShow) return false;
-    return episodeIndex < 2; // Only first 2 episodes are free
+    return episodeIndex < 2; // Episodes 1 and 2 are free
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        loading,
         isAuthenticated: !!user,
-        isPremium: user?.tier === 'premium',
+        isPremium,
         rememberedEmail,
         isUpgradeModalOpen,
         openUpgradeModal: () => setIsUpgradeModalOpen(true),
@@ -323,8 +284,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resetPassword,
         upgradeToPremium,
         downgradeToFree,
+        hasRole,
         canWatchEpisode,
-        canWatchFullMovie: user?.tier === 'premium'
+        canWatchFullMovie: isPremium
       }}
     >
       {children}
