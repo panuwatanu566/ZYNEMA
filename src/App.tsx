@@ -16,6 +16,10 @@ import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { AdminUsersPage } from './pages/AdminUsersPage';
+import { RouteGuardPage } from './pages/RouteGuardPage';
+import { ForbiddenPage } from './pages/ForbiddenPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Scroll to top on every route change
 const ScrollToTop: React.FC = () => {
@@ -50,7 +54,20 @@ const AppContent: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          {/* Public utility pages */}
+          <Route path="/forbidden" element={<ForbiddenPage />} />
+          <Route path="/roles" element={<RouteGuardPage />} />
+
+          {/* Protected: any authenticated user */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Protected: ADMIN only */}
+          <Route element={<ProtectedRoute roles={['ADMIN']} />}>
+            <Route path="/admin/users" element={<AdminUsersPage />} />
+          </Route>
+
           <Route path="*" element={<HomePage />} />
         </Routes>
       </main>

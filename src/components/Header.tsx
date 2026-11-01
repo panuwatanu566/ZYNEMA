@@ -73,6 +73,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
                   <li className={isActive('/blog') ? 'active' : ''}>
                     <Link to="/blog">News & Reviews</Link>
                   </li>
+                  <li className={isActive('/roles') ? 'active' : ''}>
+                    <Link to="/roles">
+                      <i className="fa fa-shield mr-1 text-warning"></i> Route Guard
+                    </Link>
+                  </li>
+                  {user?.role === 'ADMIN' && (
+                    <li className={isActive('/admin/users') ? 'active' : ''}>
+                      <Link to="/admin/users" style={{ color: '#f59e0b', fontWeight: 700 }}>
+                        <i className="fa fa-lock mr-1"></i> Admin Panel
+                      </Link>
+                    </li>
+                  )}
                   <li>
                     <button
                       type="button"
@@ -182,6 +194,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
                       </div>
                       <Link to="/profile" className="dropdown-item text-white py-2" onClick={() => setUserMenuOpen(false)}>
                         <i className="fa fa-user-circle mr-2"></i> Account Profile
+                      </Link>
+                      {user.role === 'ADMIN' && (
+                        <Link to="/admin/users" className="dropdown-item text-warning py-2" onClick={() => setUserMenuOpen(false)}>
+                          <i className="fa fa-lock mr-2"></i> Admin: จัดการผู้ใช้
+                        </Link>
+                      )}
+                      <Link to="/roles" className="dropdown-item text-info py-2" onClick={() => setUserMenuOpen(false)}>
+                        <i className="fa fa-shield mr-2"></i> Route Guard Demo
                       </Link>
                       {!isPremium && (
                         <button

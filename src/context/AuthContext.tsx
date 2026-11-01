@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, UserTier, UserRole } from '../types/zynema';
+import { User, UserTier, UserRole, Session } from '../types/zynema';
 import { api, tokenStore } from '../lib/api';
 
 export interface PasswordValidationResult {
@@ -71,6 +71,13 @@ interface AuthContextType {
   hasRole: (...roles: string[]) => boolean;
   canWatchEpisode: (episodeIndex: number, isPremiumShow?: boolean) => boolean;
   canWatchFullMovie: boolean;
+  updateProfile: (body: { name?: string; avatarUrl?: string | null }) => Promise<User>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  getSessions: () => Promise<Session[]>;
+  revokeSession: (id: string) => Promise<void>;
+  revokeAllSessions: () => Promise<number>;
+  getExpiredToken: () => Promise<string>;
+  refreshUser: () => Promise<User | null>;
 }
 
 const STORAGE_REMEMBER_EMAIL_KEY = 'zynema_remembered_email';
@@ -266,6 +273,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return episodeIndex < 2; // Episodes 1 and 2 are free
   };
 
+  /**
+   * Update personal profile via PATCH /auth/me
+   */
+  const updateProfile = async (body: { name?: string; avatarUrl?: string | null }): Promise<User> => {
+    const response = await api.patch('/auth/me', body);
+    const updated = response.data.data;
+    const assignedTier: UserTier =
+      updated.role === 'ADMIN' || updated.role === 'EDITOR'
+        ? 'premium'
+        : (localStorage.getItem(STORAGE_USER_TIER_KEY) as UserTier) || 'free';
+    const fullUser: User = { ...updated, tier: assignedTier };
+    setUser(fullUser);
+    return fullUser;
+  };
+
+  /**
+   * Change password via PUT /auth/change-password
+   */
+  const changePassword = async (currentPassword: string, newPassword: string): Promise<void> => {
+    const response = await api.put('/auth/change-password', {
+      currentPassword,
+      newPassword
+    });
+    tokenStore.save(response.data.data);
+  };
+
+  /**
+   * List active sessions via GET /auth/sessions
+   */
+  const getSessions = async (): Promise<Session[]> => {
+    const response = await api.get('/auth/sessions');
+    return response.data.data;
+  };
+
+  /**
+   * Revoke individual session via DELETE /auth/sessions/:id
+   */
+  const revokeSession = async (id: string): Promise<void> => {
+    await api.delete(`/auth/sessions/${id}`);
+  };
+
+  /**
+   * Revoke all sessions via POST /auth/logout-all
+   */
+  const revokeAllSessions = async (): Promise<number> => {
+    const response = await api.post('/auth/logout-all');
+    return response.data.data.revoked;
+  };
+
+  /**
+   * Request expired token via POST /auth/dev/expired-token to test auto-refresh
+   */
+  const getExpiredToken = async (): Promise<string> => {
+    const response = await api.post('/auth/dev/expired-token');
+    const expiredToken = response.data.data.accessToken;
+    localStorage.setItem('accessToken', expiredToken);
+    return expiredToken;
+  };
+
+  /**
+   * Refresh current user data via GET /auth/me
+   */
+  const refreshUser = async (): Promise<User | null> => {
+    if (!tokenStore.access) return null;
+    const response = await api.get('/auth/me');
+    const apiUser = response.data.data;
+    const assignedTier: UserTier =
+      apiUser.role === 'ADMIN' || apiUser.role === 'EDITOR'
+        ? 'premium'
+        : (localStorage.getItem(STORAGE_USER_TIER_KEY) as UserTier) || 'free';
+    const fullUser: User = { ...apiUser, tier: assignedTier };
+    setUser(fullUser);
+    return fullUser;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -286,7 +368,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         downgradeToFree,
         hasRole,
         canWatchEpisode,
-        canWatchFullMovie: isPremium
+        canWatchFullMovie: isPremium,
+        updateProfile,
+        changePassword,
+        getSessions,
+        revokeSession,
+        revokeAllSessions,
+        getExpiredToken,
+        refreshUser
       }}
     >
       {children}

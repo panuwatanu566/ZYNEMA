@@ -24,6 +24,43 @@ export interface AuthResult {
   refreshExpiresIn: number;
 }
 
+export interface Session {
+  id: string;
+  userAgent: string | null;
+  createdAt: string;
+  expiresAt: string;
+}
+
+export interface PageMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface UserStats {
+  total: number;
+  byRole: {
+    USER: number;
+    EDITOR: number;
+    ADMIN: number;
+  };
+  byStatus: {
+    ACTIVE: number;
+    BANNED: number;
+  };
+}
+
+export interface DemoResult {
+  message: string;
+  allowedRoles: string[];
+  you: {
+    id: string;
+    email: string;
+    role: string;
+  } | null;
+}
+
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
