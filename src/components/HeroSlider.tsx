@@ -64,30 +64,39 @@ export const HeroSlider: React.FC = () => {
         <div
           className="hero__items set-bg"
           style={{
-            backgroundImage: `linear-gradient(to right, rgba(11, 12, 42, 0.95) 25%, rgba(11, 12, 42, 0.5) 60%, rgba(11, 12, 42, 0.8) 100%), url(${slide.image})`,
+            backgroundImage: `linear-gradient(to right, rgba(7, 8, 20, 0.96) 20%, rgba(7, 8, 20, 0.75) 55%, rgba(7, 8, 20, 0.25) 100%), url(${slide.image})`,
             backgroundPosition: 'center top',
             transition: 'background-image 0.6s ease-in-out',
-            borderRadius: '12px',
+            borderRadius: '20px',
             position: 'relative',
-            minHeight: '440px',
-            border: '1px solid rgba(255,255,255,0.06)'
+            minHeight: '460px',
+            border: '1px solid rgba(255,255,255,0.08)',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.7)'
           }}
         >
-          <div className="row">
-            <div className="col-lg-7">
-              <div className="hero__text">
-                <div className="d-flex align-items-center mb-2" style={{ gap: '8px' }}>
-                  <div className="label mb-0">{slide.genres}</div>
+          <div className="row h-100 align-items-center">
+            <div className="col-lg-7 col-md-10">
+              <div className="hero__text p-4 p-md-5">
+                <div className="d-flex align-items-center mb-3 flex-wrap" style={{ gap: '8px' }}>
+                  <div
+                    className="badge badge-dark px-3 py-1 font-weight-bold"
+                    style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '9999px', fontSize: '11px' }}
+                  >
+                    {slide.genres}
+                  </div>
                   {slide.isPremium ? (
-                    <span className="badge badge-warning text-dark font-weight-bold px-2 py-1">
-                      👑 4K VIP
+                    <span className="badge badge-warning text-dark font-weight-bold px-3 py-1" style={{ borderRadius: '9999px', fontSize: '11px' }}>
+                      👑 4K VIP EXCLUSIVE
                     </span>
                   ) : (
-                    <span className="badge badge-info font-weight-bold px-2 py-1">
-                      FREE HD
+                    <span className="badge badge-info font-weight-bold px-3 py-1" style={{ borderRadius: '9999px', fontSize: '11px' }}>
+                      FREE HD 720P
                     </span>
                   )}
-                  <span className="badge badge-secondary px-2 py-1">
+                  <span
+                    className="badge badge-secondary px-3 py-1 font-weight-bold"
+                    style={{ borderRadius: '9999px', background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '11px' }}
+                  >
                     ★ {slide.rating}
                   </span>
                 </div>
@@ -95,12 +104,26 @@ export const HeroSlider: React.FC = () => {
                 <h2>{slide.title}</h2>
                 <p className="text-white-50">{slide.description}</p>
 
-                <div className="d-flex align-items-center" style={{ gap: '15px' }}>
+                <div className="d-flex align-items-center flex-wrap" style={{ gap: '15px' }}>
                   <Link to={`/watch/${slide.id}`} className="primary-btn">
-                    <span>Watch Now</span> <i className="fa fa-play ml-1"></i>
+                    <span>Watch Now</span> <i className="fa fa-play ml-2"></i>
                   </Link>
-                  <Link to={`/movie/${slide.id}`} className="btn btn-outline-light py-2 px-3" style={{ borderRadius: '4px', fontSize: '13px' }}>
-                    Show Info <i className="fa fa-info-circle ml-1"></i>
+                  <Link
+                    to={`/movie/${slide.id}`}
+                    className="btn d-inline-flex align-items-center"
+                    style={{
+                      borderRadius: '9999px',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      padding: '12px 24px',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      background: 'rgba(255,255,255,0.08)',
+                      backdropFilter: 'blur(8px)',
+                      color: '#fff',
+                      transition: 'all 0.25s ease'
+                    }}
+                  >
+                    Details <i className="fa fa-info-circle ml-2"></i>
                   </Link>
                 </div>
               </div>
@@ -126,14 +149,17 @@ export const HeroSlider: React.FC = () => {
                 width: '42px',
                 height: '42px',
                 borderRadius: '50%',
-                background: 'rgba(255,255,255,0.15)',
-                border: 'none',
+                background: 'rgba(7, 8, 20, 0.65)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                backdropFilter: 'blur(8px)',
                 color: '#fff',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '18px'
+                fontSize: '18px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+                transition: 'all 0.2s ease'
               }}
               title="Previous Title"
             >
@@ -146,14 +172,17 @@ export const HeroSlider: React.FC = () => {
                 width: '42px',
                 height: '42px',
                 borderRadius: '50%',
-                background: 'rgba(255,255,255,0.15)',
-                border: 'none',
+                background: 'rgba(7, 8, 20, 0.65)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                backdropFilter: 'blur(8px)',
                 color: '#fff',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '18px'
+                fontSize: '18px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+                transition: 'all 0.2s ease'
               }}
               title="Next Title"
             >

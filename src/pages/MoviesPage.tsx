@@ -185,47 +185,93 @@ export const MoviesPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Tier Filter Pills */}
-                <div className="d-flex flex-wrap gap-2 mb-3" style={{ gap: '8px' }}>
-                  <button
-                    type="button"
-                    onClick={() => handleTierChange('all')}
-                    className={`btn btn-sm ${selectedTier === 'all' ? 'btn-danger' : 'btn-outline-secondary text-white'}`}
-                    style={{ borderRadius: '20px', fontSize: '13px' }}
-                  >
-                    All Tiers
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleTierChange('free')}
-                    className={`btn btn-sm ${selectedTier === 'free' ? 'btn-info' : 'btn-outline-info'}`}
-                    style={{ borderRadius: '20px', fontSize: '13px' }}
-                  >
-                    FREE HD (720p)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleTierChange('premium')}
-                    className={`btn btn-sm ${selectedTier === 'premium' ? 'btn-warning text-dark font-weight-bold' : 'btn-outline-warning'}`}
-                    style={{ borderRadius: '20px', fontSize: '13px' }}
-                  >
-                    👑 VIP Premium Only
-                  </button>
-                </div>
-
-                {/* Genre Filter Pills */}
-                <div className="d-flex flex-wrap gap-2 mb-4" style={{ gap: '6px' }}>
-                  {GENRES.map((genre) => (
+                {/* Modern Filter Pill Bar */}
+                <div
+                  className="p-3 mb-4 rounded"
+                  style={{
+                    background: 'rgba(14, 18, 42, 0.65)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)'
+                  }}
+                >
+                  {/* Tier Filter Pills */}
+                  <div className="d-flex flex-wrap align-items-center mb-3" style={{ gap: '8px' }}>
+                    <span className="small text-muted font-weight-bold mr-1">สิทธิ์การรับชม:</span>
                     <button
-                      key={genre}
                       type="button"
-                      onClick={() => handleGenreChange(genre)}
-                      className={`btn btn-sm ${selectedGenre === genre ? 'btn-danger' : 'btn-outline-secondary text-white-50'}`}
-                      style={{ fontSize: '12px', borderRadius: '15px', padding: '3px 12px' }}
+                      onClick={() => handleTierChange('all')}
+                      className="btn btn-sm"
+                      style={{
+                        borderRadius: '9999px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        padding: '5px 14px',
+                        background: selectedTier === 'all' ? 'linear-gradient(135deg, #e53637, #ff5252)' : 'rgba(255,255,255,0.06)',
+                        color: '#fff',
+                        border: selectedTier === 'all' ? '1px solid #e53637' : '1px solid rgba(255,255,255,0.08)'
+                      }}
                     >
-                      {genre}
+                      ทั้งหมด (All)
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={() => handleTierChange('free')}
+                      className="btn btn-sm"
+                      style={{
+                        borderRadius: '9999px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        padding: '5px 14px',
+                        background: selectedTier === 'free' ? 'linear-gradient(135deg, #0284c7, #06b6d4)' : 'rgba(255,255,255,0.06)',
+                        color: selectedTier === 'free' ? '#fff' : '#00d2d3',
+                        border: selectedTier === 'free' ? '1px solid #06b6d4' : '1px solid rgba(6,182,212,0.3)'
+                      }}
+                    >
+                      🎬 สมาชิก Free HD
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTierChange('premium')}
+                      className="btn btn-sm"
+                      style={{
+                        borderRadius: '9999px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        padding: '5px 14px',
+                        background: selectedTier === 'premium' ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : 'rgba(245,158,11,0.12)',
+                        color: selectedTier === 'premium' ? '#0f172a' : '#f59e0b',
+                        border: '1px solid rgba(245,158,11,0.5)',
+                        boxShadow: selectedTier === 'premium' ? '0 2px 10px rgba(245,158,11,0.3)' : 'none'
+                      }}
+                    >
+                      👑 VIP Premium 4K
+                    </button>
+                  </div>
+
+                  {/* Genre Filter Pills */}
+                  <div className="d-flex flex-wrap align-items-center" style={{ gap: '6px' }}>
+                    <span className="small text-muted font-weight-bold mr-1">หมวดหมู่:</span>
+                    {GENRES.map((genre) => (
+                      <button
+                        key={genre}
+                        type="button"
+                        onClick={() => handleGenreChange(genre)}
+                        className="btn btn-sm"
+                        style={{
+                          borderRadius: '9999px',
+                          fontSize: '12px',
+                          fontWeight: 500,
+                          padding: '4px 12px',
+                          background: selectedGenre === genre ? '#ffffff' : 'rgba(255,255,255,0.05)',
+                          color: selectedGenre === genre ? '#0f172a' : '#94a3b8',
+                          border: selectedGenre === genre ? '1px solid #ffffff' : '1px solid rgba(255,255,255,0.06)',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {genre}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {loading ? (

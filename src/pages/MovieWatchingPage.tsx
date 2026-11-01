@@ -170,17 +170,20 @@ export const MovieWatchingPage: React.FC = () => {
           <div
             className="p-3 mb-4 rounded d-flex flex-wrap align-items-center justify-content-between"
             style={{
-              background: 'linear-gradient(90deg, #151842, #0d0f2b)',
-              border: isPremium ? '1px solid rgba(243, 156, 18, 0.4)' : '1px solid rgba(0, 210, 211, 0.4)'
+              background: 'rgba(14, 18, 44, 0.75)',
+              backdropFilter: 'blur(16px)',
+              border: isPremium ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(6, 182, 212, 0.4)',
+              borderRadius: '16px',
+              boxShadow: '0 8px 25px rgba(0,0,0,0.35)'
             }}
           >
             <div className="d-flex align-items-center mb-2 mb-md-0">
-              <span className="mr-2 text-white font-weight-bold">สถานะสิทธิ์สมาชิก:</span>
+              <span className="mr-2 text-white font-weight-bold small">สถานะสิทธิ์สมาชิก:</span>
               <span
                 className={`badge ${isPremium ? 'badge-warning text-dark font-weight-bold' : 'badge-info'} px-3 py-2 mr-3`}
-                style={{ fontSize: '13px' }}
+                style={{ fontSize: '12.5px', borderRadius: '9999px' }}
               >
-                {isPremium ? '👑 สมาชิก VIP PREMIUM (ดูหนังเต็มเรื่องได้)' : '🎬 สมาชิก FREE (ดูได้เฉพาะตัวอย่างหนัง)'}
+                {isPremium ? '👑 VIP PREMIUM (ดูหนังเต็มเรื่องได้)' : '🎬 FREE MEMBER (ดูตัวอย่างหนัง)'}
               </span>
             </div>
 
@@ -189,19 +192,24 @@ export const MovieWatchingPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={upgradeToPremium}
-                  className="btn btn-sm btn-warning font-weight-bold text-dark px-3"
-                  style={{ borderRadius: '20px' }}
+                  className="btn btn-sm font-weight-bold text-dark px-3 py-2"
+                  style={{
+                    borderRadius: '9999px',
+                    background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                    boxShadow: '0 4px 15px rgba(245, 158, 11, 0.35)',
+                    fontSize: '12.5px'
+                  }}
                 >
-                  <i className="fa fa-bolt mr-1"></i> สลับเป็นสิทธิ์ Premium (ดูหนังเต็มเรื่อง)
+                  <i className="fa fa-bolt mr-1"></i> สลับเป็นสิทธิ์ VIP (ดูหนังเต็มเรื่อง)
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={downgradeToFree}
-                  className="btn btn-sm btn-outline-info text-white px-3"
-                  style={{ borderRadius: '20px' }}
+                  className="btn btn-sm btn-outline-info text-white px-3 py-2"
+                  style={{ borderRadius: '9999px', fontSize: '12.5px' }}
                 >
-                  <i className="fa fa-lock mr-1"></i> สลับเป็นสิทธิ์ Free (ทดสอบดูได้แค่ตัวอย่าง)
+                  <i className="fa fa-lock mr-1"></i> สลับเป็นสิทธิ์ Free (ทดสอบดูตัวอย่าง)
                 </button>
               )}
             </div>
@@ -209,15 +217,15 @@ export const MovieWatchingPage: React.FC = () => {
 
           <div className="row">
             <div className="col-lg-12">
-              {/* Media Player Box */}
+              {/* Media Player Cinema Box */}
               <div
                 className="anime__video__player mb-3 position-relative"
                 style={{
-                  borderRadius: '12px',
+                  borderRadius: '16px',
                   overflow: 'hidden',
-                  boxShadow: '0 15px 40px rgba(0,0,0,0.7)',
+                  boxShadow: '0 25px 60px -15px rgba(0,0,0,0.95), 0 0 35px rgba(229, 54, 55, 0.22)',
                   background: '#000',
-                  border: isPremium && viewMode === 'full' ? '2px solid rgba(243, 156, 18, 0.5)' : '2px solid rgba(229, 54, 55, 0.4)'
+                  border: isPremium && viewMode === 'full' ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid rgba(229, 54, 55, 0.5)'
                 }}
               >
                 {/* Status Badges Overlay */}
@@ -319,35 +327,53 @@ export const MovieWatchingPage: React.FC = () => {
               {/* Mode Switcher & Server Selectors */}
               <div
                 className="p-3 mb-4 rounded d-flex flex-wrap align-items-center justify-content-between"
-                style={{ background: '#0e1035', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{
+                  background: 'rgba(14, 18, 44, 0.75)',
+                  backdropFilter: 'blur(14px)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '14px',
+                  boxShadow: '0 8px 25px rgba(0,0,0,0.3)'
+                }}
               >
                 {/* Watch Full Movie vs Trailer buttons */}
                 <div className="d-flex flex-wrap align-items-center mb-2 mb-md-0" style={{ gap: '10px' }}>
                   <button
                     type="button"
                     onClick={handleSelectFullMovie}
-                    className={`btn btn-sm ${
-                      isPremium && viewMode === 'full'
-                        ? 'btn-danger font-weight-bold'
-                        : 'btn-outline-danger'
-                    }`}
-                    style={{ borderRadius: '20px', padding: '6px 18px' }}
+                    className="btn btn-sm d-inline-flex align-items-center"
+                    style={{
+                      borderRadius: '9999px',
+                      padding: '8px 20px',
+                      fontWeight: 600,
+                      fontSize: '13px',
+                      background: isPremium && viewMode === 'full' ? 'linear-gradient(135deg, #e53637, #ff5252)' : 'rgba(255,255,255,0.06)',
+                      color: '#ffffff',
+                      border: isPremium && viewMode === 'full' ? '1px solid #e53637' : '1px solid rgba(255,255,255,0.15)',
+                      boxShadow: isPremium && viewMode === 'full' ? '0 4px 15px rgba(229,54,55,0.4)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
                   >
-                    <i className="fa fa-play mr-1"></i> ดูหนังเต็มเรื่อง (Full Movie)
+                    <i className="fa fa-play mr-2"></i> ดูหนังเต็มเรื่อง (Full Movie)
                     {!isPremium && <i className="fa fa-lock ml-2 text-warning"></i>}
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setViewMode('trailer')}
-                    className={`btn btn-sm ${
-                      viewMode === 'trailer'
-                        ? 'btn-info font-weight-bold'
-                        : 'btn-outline-info'
-                    }`}
-                    style={{ borderRadius: '20px', padding: '6px 18px' }}
+                    className="btn btn-sm d-inline-flex align-items-center"
+                    style={{
+                      borderRadius: '9999px',
+                      padding: '8px 20px',
+                      fontWeight: 600,
+                      fontSize: '13px',
+                      background: viewMode === 'trailer' ? 'linear-gradient(135deg, #0284c7, #06b6d4)' : 'rgba(255,255,255,0.06)',
+                      color: '#ffffff',
+                      border: viewMode === 'trailer' ? '1px solid #06b6d4' : '1px solid rgba(255,255,255,0.15)',
+                      boxShadow: viewMode === 'trailer' ? '0 4px 15px rgba(6,182,212,0.3)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
                   >
-                    <i className="fa fa-film mr-1"></i> ดูตัวอย่างหนัง (Trailer)
+                    <i className="fa fa-film mr-2"></i> ดูตัวอย่างหนัง (Trailer)
                   </button>
                 </div>
 
@@ -366,6 +392,7 @@ export const MovieWatchingPage: React.FC = () => {
                           className={`btn ${
                             selectedServerIndex === sIdx ? 'btn-warning text-dark font-weight-bold' : 'btn-dark text-white'
                           }`}
+                          style={{ borderRadius: sIdx === 0 ? '8px 0 0 8px' : sIdx === 2 ? '0 8px 8px 0' : '0' }}
                         >
                           Server {sIdx + 1}
                         </button>
@@ -419,29 +446,31 @@ export const MovieWatchingPage: React.FC = () => {
                         key={ep.id || idx}
                         type="button"
                         onClick={() => handleSelectEpisode(idx)}
-                        className={`btn ${
-                          isCurrent
-                            ? 'btn-danger font-weight-bold'
-                            : isPremium
-                            ? 'btn-secondary text-white'
-                            : 'btn-dark text-muted'
-                        }`}
+                        className="btn"
                         style={{
-                          minWidth: '85px',
-                          padding: '8px 14px',
-                          borderRadius: '6px',
+                          minWidth: '90px',
+                          padding: '10px 16px',
+                          borderRadius: '12px',
+                          background: isCurrent
+                            ? 'linear-gradient(135deg, #e53637, #ff5252)'
+                            : isPremium
+                            ? 'rgba(255, 255, 255, 0.06)'
+                            : 'rgba(255, 255, 255, 0.02)',
+                          color: isCurrent ? '#ffffff' : isPremium ? '#e2e8f0' : '#64748b',
                           border: isCurrent
-                            ? '2px solid #fff'
+                            ? '1px solid #ff5252'
                             : isPremium
                             ? '1px solid rgba(255,255,255,0.1)'
-                            : '1px dashed rgba(255,255,255,0.2)',
+                            : '1px dashed rgba(255,255,255,0.15)',
+                          boxShadow: isCurrent ? '0 4px 18px rgba(229, 54, 55, 0.45)' : 'none',
+                          transition: 'all 0.2s ease',
                           position: 'relative'
                         }}
                       >
-                        <div>Ep {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}</div>
+                        <div className="font-weight-bold">Ep {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}</div>
                         <div style={{ fontSize: '10px' }}>
                           {isPremium ? (
-                            <span className="text-warning"><i className="fa fa-check"></i> VIP 4K</span>
+                            <span className={isCurrent ? 'text-white' : 'text-warning'}><i className="fa fa-check"></i> VIP 4K</span>
                           ) : (
                             <span className="text-danger"><i className="fa fa-lock"></i> ล็อก</span>
                           )}

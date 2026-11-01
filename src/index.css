@@ -1,19 +1,67 @@
-/* Custom React Enhancements and Overrides for ZYNEMA */
+/* ============================================================
+   ZYNEMA MODERN CINEMATIC DESIGN SYSTEM (2025/2026 UI UPGRADE)
+   ============================================================ */
+
+/* Import Modern Sans-Serif Typography */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', 'Oswald', sans-serif;
+  
+  /* Primary & Accent Colors */
+  --color-primary: #e53637;
+  --color-primary-hover: #ff5252;
+  --color-primary-glow: rgba(229, 54, 55, 0.45);
+  
+  --color-vip: #f59e0b;
+  --color-vip-glow: rgba(245, 158, 11, 0.4);
+  
+  --color-cyan: #06b6d4;
+  --color-cyan-glow: rgba(6, 182, 212, 0.35);
+
+  /* Modern Glass & Surface Colors */
+  --bg-body: #070814;
+  --bg-surface: rgba(14, 18, 42, 0.7);
+  --bg-surface-elevated: rgba(22, 28, 60, 0.85);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass-hover: rgba(229, 54, 55, 0.45);
+}
 
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Loading animations */
+/* Modern Dark Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070814;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e2242;
+  border-radius: 10px;
+  border: 2px solid #070814;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e53637;
+}
+
+/* Animations */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
 @keyframes pulseGlow {
-  0%, 100% { transform: scale(0.88); opacity: 0.35; }
-  50% { transform: scale(1.18); opacity: 0.85; }
+  0%, 100% { transform: scale(0.92); opacity: 0.45; }
+  50% { transform: scale(1.12); opacity: 0.95; }
 }
 
 @keyframes shimmer {
@@ -25,67 +73,23 @@ html {
   animation: shimmer 1.5s infinite linear;
 }
 
+/* ============================================================
+   GLOBAL BODY & CINEMATIC AMBIENT LIGHT
+   ============================================================ */
 body {
-  background-color: #0b0c2a;
-  color: #ffffff;
+  font-family: var(--font-main) !important;
+  background-color: var(--bg-body) !important;
+  background-image: 
+    radial-gradient(at 12% 10%, rgba(229, 54, 55, 0.11) 0px, transparent 50%),
+    radial-gradient(at 88% 18%, rgba(99, 102, 241, 0.09) 0px, transparent 50%),
+    radial-gradient(at 50% 90%, rgba(245, 158, 11, 0.06) 0px, transparent 55%) !important;
+  background-attachment: fixed !important;
+  color: #f1f5f9 !important;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-/* ============================================================
-   FORM INPUT STYLING (High-Contrast, Crisp Text)
-   ============================================================ */
-.login__form form .input__item {
-  width: 100% !important;
-  max-width: 100% !important;
-  position: relative !important;
-  margin-bottom: 18px !important;
-}
-
-.login__form form .input__item input {
-  height: 52px !important;
-  width: 100% !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  color: #0f172a !important; /* Crisp, high-contrast dark text */
-  background: #ffffff !important;
-  border: 2px solid transparent !important;
-  border-radius: 6px !important;
-  padding-left: 76px !important;
-  padding-right: 48px !important;
-  outline: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
-  transition: all 0.2s ease !important;
-}
-
-.login__form form .input__item input:focus {
-  border-color: #e53637 !important;
-  box-shadow: 0 0 0 3px rgba(229, 54, 55, 0.25) !important;
-}
-
-.login__form form .input__item input::placeholder {
-  color: #94a3b8 !important; /* Visible placeholder */
-  font-weight: 400 !important;
-}
-
-.login__form form .input__item input::-webkit-input-placeholder {
-  color: #94a3b8 !important;
-}
-
-.login__form form .input__item input::-moz-placeholder {
-  color: #94a3b8 !important;
-}
-
-.login__form form .input__item span {
-  color: #64748b !important;
-  font-size: 20px !important;
-}
-
-.login__form form .input__item:before {
-  background: #cbd5e1 !important;
-  height: 30px !important;
-  top: 11px !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
@@ -98,7 +102,35 @@ main {
   flex: 1 0 auto;
 }
 
-/* Header layout & top-level nav items ONLY */
+/* ============================================================
+   HEADER: STICKY FROSTED GLASS & MODERN NAVIGATION
+   ============================================================ */
+header.header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+  background: rgba(7, 8, 20, 0.88) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  border-bottom: 1px solid var(--border-glass) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
+  padding: 14px 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+.header__logo a {
+  display: inline-flex !important;
+  align-items: center !important;
+  text-decoration: none !important;
+}
+
+.header__logo span {
+  font-family: var(--font-heading) !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+}
+
+/* Header layout & top-level nav items */
 .header__menu > ul {
   display: flex !important;
   align-items: center !important;
@@ -110,15 +142,35 @@ main {
 }
 
 .header__menu > ul > li {
-  margin-right: 22px !important;
+  margin: 0 16px !important;
   display: inline-flex !important;
   align-items: center !important;
   position: relative !important;
 }
 
-/* ============================================================
-   HEADER DROPDOWN (Vertical List inside the frame)
-   ============================================================ */
+.header__menu > ul > li > a {
+  font-family: var(--font-main) !important;
+  font-size: 14.5px !important;
+  font-weight: 600 !important;
+  color: #cbd5e1 !important;
+  text-decoration: none !important;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  transition: all 0.25s ease !important;
+  letter-spacing: 0.2px !important;
+}
+
+.header__menu > ul > li:hover > a,
+.header__menu > ul > li.active > a {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.header__menu > ul > li.active > a {
+  color: var(--color-primary-hover) !important;
+}
+
+/* Header Dropdown (Frosted Glass Container) */
 .header__menu li.dropdown-container {
   position: relative !important;
 }
@@ -129,18 +181,20 @@ main {
   position: absolute !important;
   left: 0 !important;
   top: 100% !important;
-  width: 210px !important;
-  min-width: 210px !important;
-  background: #0e1035 !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 8px !important;
+  width: 220px !important;
+  min-width: 220px !important;
+  background: rgba(14, 18, 44, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 12px !important;
   text-align: left !important;
-  padding: 8px 0 !important;
+  padding: 10px 0 !important;
   z-index: 99999 !important;
   opacity: 0 !important;
   visibility: hidden !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.85) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 20px rgba(229, 54, 55, 0.15) !important;
   white-space: normal !important;
   list-style: none !important;
   margin: 0 !important;
@@ -151,7 +205,7 @@ main {
   display: flex !important;
   opacity: 1 !important;
   visibility: visible !important;
-  top: calc(100% + 4px) !important;
+  top: calc(100% + 8px) !important;
 }
 
 .header__menu ul.dropdown li {
@@ -165,9 +219,9 @@ main {
   display: block !important;
   width: 100% !important;
   font-size: 14px !important;
-  color: #cbd5e1 !important;
+  color: #94a3b8 !important;
   font-weight: 500 !important;
-  padding: 9px 20px !important;
+  padding: 10px 20px !important;
   text-transform: none !important;
   transition: all 0.2s ease !important;
   text-align: left !important;
@@ -180,8 +234,287 @@ main {
   padding-left: 24px !important;
 }
 
+/* Header Right Actions */
+.header__right .search-switch {
+  transition: transform 0.2s ease, color 0.2s ease !important;
+  outline: none !important;
+}
+
+.header__right .search-switch:hover {
+  color: var(--color-primary) !important;
+  transform: scale(1.12) !important;
+}
+
 /* ============================================================
-   CUSTOM MODAL OVERLAY & CARD (Fixed positioning & opacity bug)
+   BUTTONS: MODERN GLOWING GRADIENTS
+   ============================================================ */
+.primary-btn,
+.site-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: var(--font-main) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #e53637 0%, #ff5252 100%) !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  padding: 12px 28px !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 18px var(--color-primary-glow) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+}
+
+.primary-btn:hover,
+.site-btn:hover {
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(229, 54, 55, 0.6) !important;
+  filter: brightness(1.08) !important;
+  text-decoration: none !important;
+}
+
+.primary-btn:active,
+.site-btn:active {
+  transform: translateY(0) !important;
+}
+
+/* ============================================================
+   SECTION TITLES: MODERN RED ACCENT ACCENTUATION
+   ============================================================ */
+.section-title {
+  margin-bottom: 24px !important;
+  position: relative !important;
+}
+
+.section-title h4,
+.section-title h5 {
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+  font-size: 20px !important;
+  letter-spacing: -0.01em !important;
+  position: relative !important;
+  padding-left: 16px !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 0 !important;
+}
+
+.section-title h4:after,
+.section-title h5:after {
+  position: absolute !important;
+  left: 0 !important;
+  top: 3px !important;
+  height: calc(100% - 6px) !important;
+  width: 4px !important;
+  background: linear-gradient(180deg, #e53637, #ff5e62) !important;
+  content: "" !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 12px var(--color-primary) !important;
+}
+
+/* ============================================================
+   MOVIE CARD (Sleek Rounded Posters & Hover Physics)
+   ============================================================ */
+.product__item {
+  background: rgba(14, 18, 42, 0.45) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  padding-bottom: 12px !important;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35) !important;
+}
+
+.product__item:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 22px rgba(229, 54, 55, 0.25) !important;
+  border-color: rgba(229, 54, 55, 0.5) !important;
+}
+
+.product__item__pic {
+  height: 310px !important;
+  border-radius: 14px 14px 0 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: transform 0.45s ease !important;
+}
+
+.product__item:hover .product__item__pic {
+  transform: scale(1.03) !important;
+}
+
+/* Card Gradient Vignette Overlay */
+.product__item__pic:after {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 55% !important;
+  background: linear-gradient(to top, rgba(7, 8, 20, 0.95) 0%, rgba(7, 8, 20, 0.3) 50%, transparent 100%) !important;
+  pointer-events: none !important;
+}
+
+/* Modern Pill Badges on Card */
+.product__item__pic .ep {
+  border-radius: 9999px !important;
+  padding: 4px 12px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  top: 12px !important;
+  left: 12px !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 5 !important;
+}
+
+.product__item__pic .comment,
+.product__item__pic .view {
+  border-radius: 9999px !important;
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  bottom: 12px !important;
+  z-index: 5 !important;
+}
+
+.product__item__pic .comment {
+  left: 12px !important;
+  right: auto !important;
+}
+
+.product__item__pic .view {
+  right: 12px !important;
+}
+
+/* Card Text */
+.product__item__text {
+  padding: 14px 14px 4px !important;
+}
+
+.product__item__text ul {
+  margin-bottom: 6px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+.product__item__text ul li {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #94a3b8 !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-radius: 6px !important;
+  padding: 2px 8px !important;
+  margin-right: 0 !important;
+}
+
+.product__item__text h5 {
+  margin-bottom: 0 !important;
+}
+
+.product__item__text h5 a {
+  font-family: var(--font-main) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  transition: color 0.2s ease !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 1 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+.product__item:hover .product__item__text h5 a {
+  color: var(--color-primary) !important;
+}
+
+/* ============================================================
+   HERO BANNER: CINEMATIC CURVED CONTAINER & GLASS CARD
+   ============================================================ */
+.hero__items {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--border-glass) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7) !important;
+}
+
+.hero__text h2 {
+  font-family: var(--font-heading) !important;
+  font-size: 42px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.15 !important;
+  margin-bottom: 14px !important;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+}
+
+.hero__text p {
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  color: #cbd5e1 !important;
+  margin-bottom: 24px !important;
+}
+
+/* ============================================================
+   MODERN FORM INPUTS (High Contrast, Crisp & Glowing)
+   ============================================================ */
+.login__form form .input__item {
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative !important;
+  margin-bottom: 18px !important;
+}
+
+.login__form form .input__item input {
+  height: 52px !important;
+  width: 100% !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #0f172a !important; /* High contrast text */
+  background: #ffffff !important;
+  border: 2px solid transparent !important;
+  border-radius: 8px !important;
+  padding-left: 76px !important;
+  padding-right: 48px !important;
+  outline: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.2s ease !important;
+}
+
+.login__form form .input__item input:focus {
+  border-color: #e53637 !important;
+  box-shadow: 0 0 0 3px rgba(229, 54, 55, 0.25) !important;
+}
+
+.login__form form .input__item input::placeholder {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+}
+
+.login__form form .input__item span {
+  color: #64748b !important;
+  font-size: 20px !important;
+}
+
+.login__form form .input__item:before {
+  background: #cbd5e1 !important;
+  height: 30px !important;
+  top: 11px !important;
+}
+
+/* ============================================================
+   CUSTOM MODAL OVERLAY & CARD (Fixed positioning & blur)
    ============================================================ */
 .custom-modal-overlay {
   position: fixed !important;
@@ -191,14 +524,14 @@ main {
   bottom: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
-  background-color: rgba(5, 6, 24, 0.92) !important;
+  background-color: rgba(5, 6, 20, 0.92) !important;
   z-index: 999999 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   padding: 20px !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   opacity: 1 !important;
   overflow-y: auto !important;
 }
@@ -207,8 +540,8 @@ main {
   position: relative !important;
   width: 100% !important;
   max-width: 520px !important;
-  background: linear-gradient(145deg, #13153d, #0b0c2a) !important;
-  border-radius: 16px !important;
+  background: linear-gradient(145deg, #121538, #0a0b22) !important;
+  border-radius: 18px !important;
   border: 1px solid rgba(229, 54, 55, 0.5) !important;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(229, 54, 55, 0.25) !important;
   overflow: hidden !important;
@@ -229,87 +562,107 @@ main {
 }
 
 /* ============================================================
-   BREADCRUMBS STYLING (Fixed corrupted pseudo-elements & layout)
+   BREADCRUMBS: MODERN CLEAN BAR
    ============================================================ */
-/* Suppress legacy corrupted content: "?" from style.css */
 .breadcrumb__links a:after {
   display: none !important;
   content: "" !important;
 }
 
 .custom-breadcrumb-bar {
-  background: rgba(8, 9, 30, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 12px 0;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  background: rgba(8, 9, 24, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+  border-bottom: 1px solid var(--border-glass) !important;
+  padding: 12px 0 !important;
+  margin-bottom: 25px !important;
 }
 
 .custom-breadcrumb-bar nav {
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .custom-breadcrumb-bar ol {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
 }
 
 .custom-breadcrumb-bar a {
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 14px;
-  transition: color 0.2s;
-  display: inline-flex;
-  align-items: center;
+  color: #94a3b8 !important;
+  text-decoration: none !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  transition: color 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
 }
 
 .custom-breadcrumb-bar a:hover {
-  color: #e53637;
+  color: var(--color-primary) !important;
 }
 
 .custom-breadcrumb-bar .separator {
-  color: rgba(255, 255, 255, 0.35);
-  font-size: 11px;
-  margin: 0 4px;
+  color: rgba(255, 255, 255, 0.3) !important;
+  font-size: 11px !important;
+  margin: 0 4px !important;
 }
 
 .custom-breadcrumb-bar .current-item {
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 14px;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
 }
 
-/* Search Modal enhancements */
-.search-model .search-close-switch:hover {
-  color: #e53637 !important;
+/* ============================================================
+   FOOTER: SLEEK MODERN FINISH
+   ============================================================ */
+footer.footer {
+  background: #050612 !important;
+  border-top: 1px solid var(--border-glass) !important;
+  padding: 50px 0 35px !important;
+  margin-top: auto !important;
 }
 
-.search-results .search-item:hover {
-  background: rgba(229, 54, 55, 0.2) !important;
+.page-up button {
+  background: linear-gradient(135deg, #e53637, #ff5e62) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 15px var(--color-primary-glow) !important;
+  transition: transform 0.2s ease !important;
 }
 
-/* Responsive video player */
-.anime__video__player video {
-  max-height: 540px;
-  background: #000;
-  width: 100%;
+.page-up button:hover {
+  transform: translateY(-4px) !important;
 }
 
-/* Set BG utility helper for inline backgroundImage */
+/* ============================================================
+   PILL BADGES (Gold, Red, Cyan)
+   ============================================================ */
+.badge-warning {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24) !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3) !important;
+}
+
+.badge-danger {
+  background: linear-gradient(135deg, #e53637, #ff5252) !important;
+  box-shadow: 0 2px 10px rgba(229, 54, 55, 0.3) !important;
+}
+
+.badge-info {
+  background: linear-gradient(135deg, #0284c7, #06b6d4) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.3) !important;
+}
+
+/* Utility Helpers */
 .set-bg {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: top center;
-}
-
-/* Button hover feedback */
-.follow-btn:hover {
-  background: #e53637;
-  color: #fff;
 }

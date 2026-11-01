@@ -18,13 +18,13 @@ export const MovieCard: React.FC<MovieCardProps> = ({
   return (
     <div className={`${columnClass} mb-4`}>
       <div className="product__item">
-        <Link to={`/movie/${show.id}`}>
+        <Link to={`/movie/${show.id}`} className="d-block position-relative">
           <div
             className="product__item__pic set-bg"
             style={{
               backgroundImage: `url(${posterUrl})`,
               position: 'relative',
-              borderRadius: '6px',
+              borderRadius: '12px 12px 0 0',
               overflow: 'hidden'
             }}
           >
@@ -33,28 +33,36 @@ export const MovieCard: React.FC<MovieCardProps> = ({
               <div
                 className="ep"
                 style={{
-                  background: 'linear-gradient(90deg, #f39c12, #e53637)',
-                  color: '#fff',
-                  fontWeight: 'bold',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.4)'
+                  background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                  color: '#0f172a',
+                  fontWeight: 800,
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)'
                 }}
               >
-                👑 PREMIUM
+                👑 4K VIP
               </div>
             ) : (
-              <div className="ep" style={{ background: '#1d1e39', color: '#00d2d3' }}>
-                FREE 720P
+              <div
+                className="ep"
+                style={{
+                  background: 'linear-gradient(135deg, #0284c7, #06b6d4)',
+                  color: '#ffffff',
+                  fontWeight: 700,
+                  boxShadow: '0 4px 12px rgba(6, 182, 212, 0.3)'
+                }}
+              >
+                FREE HD
               </div>
             )}
 
             {/* Rating */}
-            <div className="comment" style={{ background: 'rgba(0,0,0,0.7)' }}>
-              <i className="fa fa-star text-warning"></i> {rating}
+            <div className="comment">
+              <i className="fa fa-star text-warning mr-1"></i> {rating}
             </div>
 
             {/* Year / Runtime */}
-            <div className="view" style={{ background: 'rgba(0,0,0,0.7)' }}>
-              <i className="fa fa-clock-o"></i> {year}
+            <div className="view">
+              <i className="fa fa-calendar-o mr-1"></i> {year}
             </div>
           </div>
         </Link>

@@ -121,9 +121,11 @@ export const MovieDetailsPage: React.FC = () => {
                   className="anime__details__pic set-bg"
                   style={{
                     backgroundImage: `url(${poster})`,
-                    borderRadius: '8px',
+                    borderRadius: '16px',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.7)',
+                    border: '1px solid rgba(255,255,255,0.1)'
                   }}
                 >
                   {show.isPremiumOnly ? (
@@ -202,15 +204,37 @@ export const MovieDetailsPage: React.FC = () => {
                   </div>
 
                   <div className="anime__details__btn d-flex flex-wrap align-items-center" style={{ gap: '12px' }}>
-                    <Link to={`/watch/${show.id}`} className="watch-btn">
-                      <span>{isPremium ? 'Watch Full Movie 4K' : 'Watch Trailer (Free)'}</span> <i className="fa fa-play"></i>
+                    <Link
+                      to={`/watch/${show.id}`}
+                      className="btn font-weight-bold d-inline-flex align-items-center text-white"
+                      style={{
+                        background: 'linear-gradient(135deg, #e53637, #ff5252)',
+                        borderRadius: '9999px',
+                        padding: '12px 28px',
+                        fontSize: '14px',
+                        letterSpacing: '0.5px',
+                        boxShadow: '0 4px 18px rgba(229, 54, 55, 0.45)',
+                        transition: 'all 0.25s ease'
+                      }}
+                    >
+                      <span>{isPremium ? 'Watch Full Movie (4K)' : 'Watch Trailer (Free)'}</span> <i className="fa fa-play ml-2"></i>
                     </Link>
 
                     <button
                       type="button"
                       onClick={() => setInWatchlist(!inWatchlist)}
-                      className={`btn ${inWatchlist ? 'btn-danger' : 'btn-outline-light'} py-2 px-3`}
-                      style={{ borderRadius: '4px', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px' }}
+                      className="btn d-inline-flex align-items-center"
+                      style={{
+                        borderRadius: '9999px',
+                        padding: '12px 22px',
+                        fontSize: '13.5px',
+                        fontWeight: 600,
+                        background: inWatchlist ? 'rgba(229, 54, 55, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                        border: inWatchlist ? '1px solid #e53637' : '1px solid rgba(255, 255, 255, 0.2)',
+                        color: inWatchlist ? '#ff5252' : '#ffffff',
+                        backdropFilter: 'blur(8px)',
+                        transition: 'all 0.2s ease'
+                      }}
                     >
                       <i className={`fa ${inWatchlist ? 'fa-check' : 'fa-bookmark-o'} mr-2`}></i>
                       {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
@@ -220,10 +244,17 @@ export const MovieDetailsPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={openUpgradeModal}
-                        className="btn btn-warning font-weight-bold py-2 px-3 text-dark"
-                        style={{ borderRadius: '4px', fontSize: '13px' }}
+                        className="btn font-weight-bold d-inline-flex align-items-center text-dark"
+                        style={{
+                          background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                          borderRadius: '9999px',
+                          padding: '12px 22px',
+                          fontSize: '13.5px',
+                          boxShadow: '0 4px 15px rgba(245, 158, 11, 0.35)',
+                          transition: 'all 0.2s ease'
+                        }}
                       >
-                        <i className="fa fa-crown mr-1"></i> Unlock 4K Ultra HD
+                        <i className="fa fa-crown mr-2"></i> Unlock 4K Ultra HD
                       </button>
                     )}
                   </div>

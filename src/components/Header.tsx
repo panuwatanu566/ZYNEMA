@@ -77,10 +77,19 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
                     <button
                       type="button"
                       onClick={openUpgradeModal}
-                      className="btn btn-sm btn-link text-decoration-none p-0 text-warning font-weight-bold"
-                      style={{ fontSize: '15px' }}
+                      className="btn btn-sm d-inline-flex align-items-center text-decoration-none font-weight-bold"
+                      style={{
+                        background: isPremium ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05))' : 'rgba(255, 255, 255, 0.06)',
+                        border: isPremium ? '1px solid rgba(245, 158, 11, 0.6)' : '1px solid rgba(255, 255, 255, 0.1)',
+                        color: isPremium ? '#fbbf24' : '#cbd5e1',
+                        borderRadius: '9999px',
+                        padding: '6px 14px',
+                        fontSize: '13px',
+                        boxShadow: isPremium ? '0 0 12px rgba(245, 158, 11, 0.25)' : 'none',
+                        transition: 'all 0.25s ease'
+                      }}
                     >
-                      <i className="fa fa-crown mr-1"></i> {isPremium ? 'VIP Active' : 'Upgrade Plan'}
+                      <i className="fa fa-crown mr-1" style={{ color: '#f59e0b' }}></i> {isPremium ? 'VIP Active' : 'Upgrade Plan'}
                     </button>
                   </li>
                 </ul>
@@ -91,13 +100,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
           {/* User Auth & Actions */}
           <div className="col-xl-3 col-lg-3 col-md-3 col-6">
             <div className="header__right d-flex align-items-center justify-content-end">
-              {/* Search Button */}
+              {/* Modern Circular Search Button */}
               <button
                 type="button"
                 onClick={onOpenSearch}
-                className="search-switch bg-transparent border-0 text-white p-0 mr-3"
+                className="search-switch border-0 d-flex align-items-center justify-content-center text-white mr-3"
                 title="Search TVMaze Shows"
-                style={{ cursor: 'pointer', fontSize: '18px' }}
+                style={{
+                  cursor: 'pointer',
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.07)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  fontSize: '15px',
+                  transition: 'all 0.25s ease'
+                }}
               >
                 <span className="icon_search"></span>
               </button>

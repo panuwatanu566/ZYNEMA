@@ -41,13 +41,29 @@ export const SidebarTopViews: React.FC = () => {
       <div className="section-title">
         <h5>Top Rated Shows</h5>
       </div>
-      <ul className="filter__controls mb-4">
+      <ul
+        className="filter__controls mb-4 p-1 d-flex rounded"
+        style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', gap: '4px' }}
+      >
         {(['day', 'week', 'month', 'years'] as const).map((tab) => (
           <li
             key={tab}
             className={activeTab === tab ? 'active' : ''}
             onClick={() => setActiveTab(tab)}
-            style={{ cursor: 'pointer', textTransform: 'capitalize' }}
+            style={{
+              cursor: 'pointer',
+              textTransform: 'capitalize',
+              flex: 1,
+              textAlign: 'center',
+              borderRadius: '6px',
+              padding: '6px 0',
+              fontSize: '12px',
+              fontWeight: 600,
+              background: activeTab === tab ? '#e53637' : 'transparent',
+              color: activeTab === tab ? '#ffffff' : '#94a3b8',
+              transition: 'all 0.2s ease',
+              margin: 0
+            }}
           >
             {tab}
           </li>
@@ -60,22 +76,28 @@ export const SidebarTopViews: React.FC = () => {
             className="product__sidebar__view__item set-bg mb-3"
             style={{
               backgroundImage: `url(${item.image})`,
-              borderRadius: '6px',
+              borderRadius: '12px',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
+              border: '1px solid rgba(255,255,255,0.06)'
             }}
           >
             <div
               className="ep"
               style={{
-                background: item.isPremium ? 'linear-gradient(90deg, #f39c12, #e53637)' : '#1d1e39',
-                color: item.isPremium ? '#fff' : '#00d2d3'
+                borderRadius: '9999px',
+                padding: '3px 10px',
+                fontSize: '10px',
+                fontWeight: 800,
+                background: item.isPremium ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : 'linear-gradient(135deg, #0284c7, #06b6d4)',
+                color: item.isPremium ? '#0f172a' : '#fff'
               }}
             >
-              {item.isPremium ? '👑 VIP' : 'FREE'}
+              {item.isPremium ? '👑 4K VIP' : 'FREE HD'}
             </div>
-            <div className="view">
-              <i className="fa fa-star text-warning"></i> {item.rating}
+            <div className="view" style={{ borderRadius: '9999px', padding: '3px 8px', fontSize: '11px', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
+              <i className="fa fa-star text-warning mr-1"></i> {item.rating}
             </div>
             <h5>
               <Link to={`/movie/${item.id}`}>{item.title}</Link>

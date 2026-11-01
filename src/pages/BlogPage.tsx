@@ -34,9 +34,12 @@ export const BlogPage: React.FC = () => {
                       className="blog__item set-bg"
                       style={{
                         backgroundImage: `url(${post.image})`,
-                        borderRadius: '5px',
+                        borderRadius: '16px',
                         overflow: 'hidden',
-                        position: 'relative'
+                        position: 'relative',
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        transition: 'transform 0.3s ease'
                       }}
                     >
                       <div className="blog__item__text">
